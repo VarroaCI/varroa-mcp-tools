@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   resolve-versions:
-    runs-on: [self-hosted, varroa-mcp-tools-runner]
+    runs-on: varroa-mcp-tools-runner
     timeout-minutes: 5
     outputs:
       lts_version: ${{ steps.resolve.outputs.lts_version }}
@@ -40,7 +40,7 @@ jobs:
           echo "weekly_version=$WEEKLY" >> "$GITHUB_OUTPUT"
   build:
     needs: resolve-versions
-    runs-on: [self-hosted, varroa-mcp-tools-runner]
+    runs-on: varroa-mcp-tools-runner
     timeout-minutes: 30
     strategy:
       fail-fast: false
