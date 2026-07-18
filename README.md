@@ -2,8 +2,9 @@
 
 A Jenkins plugin that extends the official
 [mcp-server-plugin](https://github.com/jenkinsci/mcp-server-plugin) with
-operational tools for MCP agents: pipeline introspection, test results,
-node and executor status, and more. Tools are served through the same
+operational tools for MCP agents: pipeline stage/step introspection and
+node/executor status (bounded test-result tools are planned future work).
+Tools are served through the same
 `/mcp-server/mcp` endpoint and run with the permissions of the
 authenticated Jenkins user.
 

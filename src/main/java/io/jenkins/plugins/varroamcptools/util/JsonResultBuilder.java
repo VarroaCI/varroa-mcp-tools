@@ -6,10 +6,11 @@ import java.util.LinkedHashMap;
  * Fluent builder for compact, stable-key-order JSON result shapes.
  *
  * <p>Backed by {@link LinkedHashMap}, so keys serialize in insertion order.
- * The builder intentionally does not accept Jenkins core model objects
+ * Callers must not pass Jenkins core model objects
  * ({@link hudson.model.Run}, {@link hudson.model.Job},
- * {@link hudson.model.Computer}) — callers must extract the fields they
- * need and add them individually.
+ * {@link hudson.model.Computer}) as values — extract the fields you need
+ * and add them individually. The type signature ({@code add(String, Object)})
+ * cannot enforce this; it is a project convention upheld in review.
  */
 public final class JsonResultBuilder {
 

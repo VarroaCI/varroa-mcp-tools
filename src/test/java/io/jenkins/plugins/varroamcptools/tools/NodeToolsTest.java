@@ -135,13 +135,13 @@ class NodeToolsTest {
         assertThat(d1.getBoolean("truncated")).isTrue();
         assertThat(d1.getInt("limit")).isEqualTo(2);
 
-        // offset=2, limit=2 → should return the remaining 2 nodes but truncated=true
-        // (4 total nodes > 2 returned, so count-based truncated is true)
+        // offset=2, limit=2 → the remaining 2 nodes; nothing exists beyond
+        // this page, so truncated=false
         JSONObject r2 = client.callTool("getNodes", Map.of("offset", 2, "limit", 2));
         assertThat(r2.has("error")).isFalse();
         JSONObject d2 = getStructuredContent(r2);
         assertThat(d2.getJSONArray("nodes").size()).isEqualTo(2);
-        assertThat(d2.getBoolean("truncated")).isTrue();
+        assertThat(d2.getBoolean("truncated")).isFalse();
 
         client.close();
     }
@@ -368,13 +368,13 @@ class NodeToolsTest {
         assertThat(d1.getJSONArray("nodes").size()).isEqualTo(2);
         assertThat(d1.getBoolean("truncated")).isTrue();
 
-        // offset=2, limit=2 → remaining 2 nodes but truncated=true
-        // (4 total nodes > 2 returned, so count-based truncated is true)
+        // offset=2, limit=2 → the remaining 2 nodes; nothing exists beyond
+        // this page, so truncated=false
         JSONObject r2 = client.callTool("getExecutorStatus", Map.of("offset", 2, "limit", 2));
         assertThat(r2.has("error")).isFalse();
         JSONObject d2 = getStructuredContent(r2);
         assertThat(d2.getJSONArray("nodes").size()).isEqualTo(2);
-        assertThat(d2.getBoolean("truncated")).isTrue();
+        assertThat(d2.getBoolean("truncated")).isFalse();
 
         // nodeName without bounding — truncated must be false even with limit
         JSONObject r3 = client.callTool("getExecutorStatus", Map.of("nodeName", "agent-0", "limit", 1));

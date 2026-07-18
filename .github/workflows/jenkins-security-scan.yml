@@ -11,6 +11,11 @@ permissions:
   actions: read
 jobs:
   security-scan:
+    # Code scanning upload is unavailable on private personal repos (GitHub
+    # provides it free for public repos only), so the scan is skipped while
+    # this repo is private and activates automatically when it goes public
+    # (planned for jenkinsci hosting; see SR-2 transitional-CI note).
+    if: ${{ !github.event.repository.private }}
     # SR-1 (coordinator-approved 2026-07-17, cross-change-review-plugin-bootstrap.md
     # Seam Log): this delegated reusable workflow's internal `scan` job hardcodes
     # `runs-on: ubuntu-latest` with no runner-override input in its `workflow_call`

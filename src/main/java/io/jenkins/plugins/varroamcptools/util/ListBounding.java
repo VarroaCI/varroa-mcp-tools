@@ -46,7 +46,7 @@ public final class ListBounding {
 
         int toIndex = Math.min(effectiveOffset + effectiveLimit, source.size());
         List<T> slice = source.subList(effectiveOffset, toIndex);
-        boolean truncated = source.size() > slice.size();
+        boolean truncated = toIndex < source.size();
 
         return new BoundedResult<>(slice, truncated);
     }
