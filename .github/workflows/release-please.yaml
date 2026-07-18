@@ -1,0 +1,24 @@
+# Interim release automation (SR-2): publishes the plugin .hpi on GitHub
+# Releases until the plugin is hosted under the jenkinsci org, at which point
+# JEP-229 continuous delivery replaces this entire mechanism. Kept
+# self-contained for one-PR removal.
+name: Release Please
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: varroa-mcp-tools-runner
+    timeout-minutes: 5
+    steps:
+      # release-type is read from release-please-config.json, not passed inline.
+      - uses: google-github-actions/release-please-action@v4
