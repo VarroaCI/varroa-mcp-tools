@@ -1,0 +1,75 @@
+name: Canary
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # weekly, Monday 06:00 UTC
+  workflow_dispatch:
+jobs:
+  resolve-canary-versions:
+    runs-on: [self-hosted, varroa-mcp-tools-runner]
+    timeout-minutes: 5
+    outputs:
+      weekly_version: ${{ steps.resolve.outputs.weekly_version }}
+      mcp_incremental_version: ${{ steps.resolve.outputs.mcp_incremental_version }}
+    steps:
+      - id: resolve
+        run: |
+          set -euo pipefail
+          BASELINE=2.516
+          WEEKLY=$(curl -sfL https://updates.jenkins.io/latestCore.txt)
+          # forward-only: same guard as ci.yml's resolve-versions job, since
+          # this leg also passes a core -Djenkins.version override.
+          if [ "$(printf '%s\n%s\n' "$BASELINE" "$WEEKLY" | sort -V | head -n1)" != "$BASELINE" ]; then
+            echo "::error::resolved weekly core $WEEKLY is below baseline $BASELINE" ; exit 1
+          fi
+          INCR=$(curl -sfL https://repo.jenkins-ci.org/incrementals/io/jenkins/plugins/mcp-server/maven-metadata.xml \
+                 | grep -oPm1 '(?<=<latest>)[^<]+')
+          echo "weekly_version=$WEEKLY" >> "$GITHUB_OUTPUT"
+          echo "mcp_incremental_version=$INCR" >> "$GITHUB_OUTPUT"
+  build:
+    needs: resolve-canary-versions
+    runs-on: [self-hosted, varroa-mcp-tools-runner]
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - leg: latest-weekly-core
+            build_arg: -Djenkins.version=${{ needs.resolve-canary-versions.outputs.weekly_version }}
+          - leg: mcp-server-plugin-incrementals
+            build_arg: -Dmcp-server-plugin.version=${{ needs.resolve-canary-versions.outputs.mcp_incremental_version }}
+    container:
+      image: maven:3.9-eclipse-temurin-21
+      volumes:
+        - varroa-m2-cache:/root/.m2
+    steps:
+      - uses: actions/checkout@v7
+      - run: mvn -B verify ${{ matrix.build_arg }}
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: canary-surefire-reports-${{ matrix.leg }}
+          path: '**/target/surefire-reports/**'
+  file-on-failure:
+    needs: build
+    if: failure()
+    runs-on: [self-hosted, varroa-mcp-tools-runner]
+    timeout-minutes: 5
+    steps:
+      # No checkout: gh issue create/comment only needs GH_TOKEN + the repo
+      # slug, both available without a working tree.
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          EXISTING=$(gh issue list --repo "${{ github.repository }}" --label canary-failure \
+                     --state open --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --repo "${{ github.repository }}" \
+              --body "Canary failed again: $RUN_URL"
+          else
+            gh issue create --repo "${{ github.repository }}" \
+              --title "Canary failure: $(date -u +%Y-%m-%d)" \
+              --label canary-failure \
+              --body "Weekly canary run failed. See run: $RUN_URL"
+          fi

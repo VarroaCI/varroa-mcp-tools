@@ -1,0 +1,69 @@
+# NOTE: This CI setup is transitional per coordinator SR-2
+# (cross-change-review-plugin-bootstrap.md Seam Log). It targets a working
+# product now on the varroa-mcp-tools-runner (self-hosted). If/when the plugin
+# moves under the jenkinsci org, this CI is expected to be rewritten to jenkinsci
+# ecosystem conventions: a buildPlugin() Jenkinsfile (ci.jenkins.io),
+# GitHub-hosted matrix legs, and a JEP-229 cd.yml for CD. Do not mistake the
+# self-hosted container-job design for a permanent architectural commitment;
+# optimize for shipping, not for hosting-era CI.
+
+name: CI
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  resolve-versions:
+    runs-on: [self-hosted, varroa-mcp-tools-runner]
+    timeout-minutes: 5
+    outputs:
+      lts_version: ${{ steps.resolve.outputs.lts_version }}
+      weekly_version: ${{ steps.resolve.outputs.weekly_version }}
+    steps:
+      - id: resolve
+        run: |
+          set -euo pipefail
+          BASELINE=2.516
+          LTS=$(curl -sfL https://updates.jenkins.io/stable/latestCore.txt)
+          WEEKLY=$(curl -sfL https://updates.jenkins.io/latestCore.txt)
+          for v in "$LTS" "$WEEKLY"; do
+            # forward-only: numeric-major.minor comparison against baseline
+            if [ "$(printf '%s\n%s\n' "$BASELINE" "$v" | sort -V | head -n1)" != "$BASELINE" ]; then
+              echo "::error::resolved version $v is below baseline $BASELINE" ; exit 1
+            fi
+          done
+          echo "lts_version=$LTS" >> "$GITHUB_OUTPUT"
+          echo "weekly_version=$WEEKLY" >> "$GITHUB_OUTPUT"
+  build:
+    needs: resolve-versions
+    runs-on: [self-hosted, varroa-mcp-tools-runner]
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - leg: baseline
+            jdk: '17'
+            jenkins_version_arg: ''
+          - leg: latest-lts
+            jdk: '21'
+            jenkins_version_arg: -Djenkins.version=${{ needs.resolve-versions.outputs.lts_version }}
+          - leg: latest-weekly
+            jdk: '21'
+            jenkins_version_arg: -Djenkins.version=${{ needs.resolve-versions.outputs.weekly_version }}
+    container:
+      image: maven:3.9-eclipse-temurin-${{ matrix.jdk }}
+      volumes:
+        - varroa-m2-cache:/root/.m2
+    steps:
+      - uses: actions/checkout@v7
+      - run: mvn -B verify ${{ matrix.jenkins_version_arg }}
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: surefire-reports-${{ matrix.leg }}
+          path: '**/target/surefire-reports/**'
