@@ -86,4 +86,14 @@
     </pluginRepository>
   </pluginRepositories>
 
+  <build>
+    <!-- Pin the build-output name so the packaged artifact is
+         target/varroa-mcp-tools.hpi for every version. After the release
+         workflow stamps the version (versions:set), Maven's default finalName
+         would otherwise become varroa-mcp-tools-<version>, making the release
+         upload path version-dependent. Build-output name only: does not affect
+         Maven coordinates or the installed plugin short-name (from artifactId). -->
+    <finalName>varroa-mcp-tools</finalName>
+  </build>
+
 </project>
