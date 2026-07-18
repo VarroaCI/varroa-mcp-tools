@@ -1,0 +1,28 @@
+name: Jenkins Security Scan
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  security-events: write
+  contents: read
+  actions: read
+jobs:
+  security-scan:
+    # Code scanning upload is unavailable on private personal repos (GitHub
+    # provides it free for public repos only), so the scan is skipped while
+    # this repo is private and activates automatically when it goes public
+    # (planned for jenkinsci hosting; see SR-2 transitional-CI note).
+    if: ${{ !github.event.repository.private }}
+    # SR-1 (coordinator-approved 2026-07-17, cross-change-review-plugin-bootstrap.md
+    # Seam Log): this delegated reusable workflow's internal `scan` job hardcodes
+    # `runs-on: ubuntu-latest` with no runner-override input in its `workflow_call`
+    # inputs (verified against jenkins-infra/jenkins-security-scan@v2 source). It is
+    # the one named, scope-limited exception to the self-hosted mandate in this
+    # change. Do not vendor/fork to force self-hosted.
+    uses: jenkins-infra/jenkins-security-scan/.github/workflows/jenkins-security-scan.yaml@v2
+    with:
+      java-cache: maven
+      java-version: 21

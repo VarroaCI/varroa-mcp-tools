@@ -1,1 +1,22 @@
 INIT.md
+
+# Maven / HPI build
+target/
+work/
+
+# IDE
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# Java
+*.class
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local agent/tool state
+.serena/
