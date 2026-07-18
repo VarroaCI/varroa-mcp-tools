@@ -219,6 +219,8 @@ public class PipelineTools implements McpServerExtension {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         try {
             text.writeLogTo(0, new BoundedOutputStream(buffer, appliedCap));
+        } catch (CapReachedException capped) {
+            // reading stops the moment the cap is hit; buffer holds the capped prefix
         } catch (IOException e) {
             throw new RuntimeException(
                     "Failed to read log for step '" + stepId + "' in build #" + buildNumber + "'", e);
@@ -419,6 +421,9 @@ public class PipelineTools implements McpServerExtension {
      * An {@link OutputStream} that forwards at most {@code maxBytes}
      * bytes to the delegate, silently discarding the rest.
      */
+    /** Signals that the byte cap was reached and log streaming should abort. */
+    private static final class CapReachedException extends IOException {}
+
     private static final class BoundedOutputStream extends OutputStream {
 
         private final OutputStream delegate;
@@ -433,7 +438,7 @@ public class PipelineTools implements McpServerExtension {
         @Override
         public void write(int b) throws IOException {
             if (written >= maxBytes) {
-                return;
+                throw new CapReachedException();
             }
             delegate.write(b);
             written++;
@@ -442,11 +447,14 @@ public class PipelineTools implements McpServerExtension {
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
             if (written >= maxBytes) {
-                return;
+                throw new CapReachedException();
             }
             int allowed = (int) Math.min(len, maxBytes - written);
             delegate.write(b, off, allowed);
             written += allowed;
+            if (allowed < len) {
+                throw new CapReachedException();
+            }
         }
     }
 }

@@ -71,6 +71,9 @@ public final class McpSessionClient {
         readAndDiscard(conn);
         this.sessionId = conn.getHeaderField("Mcp-Session-Id");
         conn.disconnect();
+        if (this.sessionId == null || this.sessionId.isEmpty()) {
+            throw new IOException("initialize response did not include an Mcp-Session-Id header");
+        }
         this.initialized = true;
     }
 

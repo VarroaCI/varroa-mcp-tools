@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
 <div>
-    Operational MCP tools for AI agents — pipeline introspection, test
-    results, and node/executor status — served on the official
-    mcp-server-plugin endpoint. Vendor-neutral: works on any Jenkins
+    Operational MCP tools for AI agents — pipeline stage/step introspection
+    and node/executor status — served on the official mcp-server-plugin
+    endpoint. Vendor-neutral: works on any Jenkins
     installation with the mcp-server plugin installed.
 </div>
