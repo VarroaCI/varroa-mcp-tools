@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 jobs:
   resolve-canary-versions:
-    runs-on: [self-hosted, varroa-mcp-tools-runner]
+    runs-on: varroa-mcp-tools-runner
     timeout-minutes: 5
     outputs:
       weekly_version: ${{ steps.resolve.outputs.weekly_version }}
@@ -27,7 +27,7 @@ jobs:
           echo "mcp_incremental_version=$INCR" >> "$GITHUB_OUTPUT"
   build:
     needs: resolve-canary-versions
-    runs-on: [self-hosted, varroa-mcp-tools-runner]
+    runs-on: varroa-mcp-tools-runner
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -52,7 +52,7 @@ jobs:
   file-on-failure:
     needs: build
     if: failure()
-    runs-on: [self-hosted, varroa-mcp-tools-runner]
+    runs-on: varroa-mcp-tools-runner
     timeout-minutes: 5
     steps:
       # No checkout: gh issue create/comment only needs GH_TOKEN + the repo
