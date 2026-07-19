@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/varroaci/varroa-mcp-tools/compare/v1.0.1...v1.0.2) (2026-07-19)
+
+
+### Bug Fixes
+
+* run release build step under bash for set -o pipefail ([#10](https://github.com/varroaci/varroa-mcp-tools/issues/10)) ([4199bc4](https://github.com/varroaci/varroa-mcp-tools/commit/4199bc4ba3ce1d7352d661ca6daaf332c760139c))
+
 ## [1.0.1](https://github.com/varroaci/varroa-mcp-tools/compare/v1.0.0...v1.0.1) (2026-07-19)
 
 
