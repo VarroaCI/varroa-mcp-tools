@@ -49,6 +49,9 @@ jobs:
         with:
           ref: ${{ needs.release-please.outputs.tag_name }}
       - name: Stamp version and package
+        # Container run steps default to `sh`, which rejects `set -o pipefail`;
+        # the maven image ships bash, so run this step under it.
+        shell: bash
         run: |
           set -euo pipefail
           TAG='${{ needs.release-please.outputs.tag_name }}'
