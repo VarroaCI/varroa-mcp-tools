@@ -8,10 +8,10 @@ Tools are served through the same
 `/mcp-server/mcp` endpoint and run with the permissions of the
 authenticated Jenkins user.
 
-This plugin is vendor-neutral — it works on any Jenkins installation with
-the mcp-server plugin installed. It ships no authentication or
-authorization logic of its own; the install's security realm and
-authorization strategy decide everything.
+This plugin is vendor-neutral — it works on any Jenkins installation with the
+mcp-server plugin and the Pipeline plugins it builds on (see Installing). It
+ships no authentication or authorization logic of its own; the install's
+security realm and authorization strategy decide everything.
 
 ## Tools
 
@@ -29,7 +29,20 @@ Download the latest `varroa-mcp-tools.hpi` from the
 [GitHub Releases](https://github.com/varroaci/varroa-mcp-tools/releases) page,
 then install it through the Jenkins UI: Manage Jenkins → Plugins → Advanced
 settings → Deploy Plugin → upload the `.hpi` file, and restart Jenkins if
-prompted. The `mcp-server` plugin must already be installed.
+prompted.
+
+Install the required plugins first. A manual `.hpi` upload does not resolve
+dependencies, so Jenkins refuses to load the plugin if any are missing. This
+plugin depends on:
+
+- **mcp-server** — serves the tools and owns the `/mcp-server/mcp` endpoint.
+- **pipeline-graph-analysis** and **workflow-api** — back the Pipeline
+  introspection tools (`getPipelineStages`, `getStageSteps`, `getStepLog`).
+
+Install each from Manage Jenkins → Plugins → Available before deploying the
+`.hpi`; each in turn pulls its own dependencies through the update center. On a
+Jenkins that already runs Pipeline jobs, `pipeline-graph-analysis` and
+`workflow-api` are typically present already.
 
 `.hpi` and `.jpi` are the same archive format; if your tooling expects a `.jpi`
 extension, rename the downloaded file.

@@ -14,7 +14,9 @@ endpoint (`/mcp-server/mcp`) and run with the permissions of the authenticated
 Jenkins user.
 
 It is developed by the Varroa project but is strictly vendor-neutral: it must
-work on any Jenkins installation with the mcp-server plugin installed.
+work on any Jenkins installation that has the mcp-server plugin and the
+Pipeline plugins it depends on (workflow-api, pipeline-graph-analysis)
+installed.
 
 ## Principles
 
