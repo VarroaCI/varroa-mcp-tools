@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/varroaci/varroa-mcp-tools/compare/v1.0.2...v1.0.3) (2026-07-19)
+
+
+### Bug Fixes
+
+* attach release hpi via GitHub API instead of gh CLI ([#12](https://github.com/varroaci/varroa-mcp-tools/issues/12)) ([520b5a1](https://github.com/varroaci/varroa-mcp-tools/commit/520b5a1665015eab9085dcad3c6beef72bfd4e66))
+
 ## [1.0.2](https://github.com/varroaci/varroa-mcp-tools/compare/v1.0.1...v1.0.2) (2026-07-19)
 
 
