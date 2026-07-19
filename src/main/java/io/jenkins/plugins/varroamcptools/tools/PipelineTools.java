@@ -131,7 +131,7 @@ public class PipelineTools implements McpServerExtension {
 
         MemoryFlowChunk targetChunk = findStageChunk(execution, stageId, buildNumber);
         if (targetChunk == null) {
-            throw new IllegalArgumentException("No such stage '" + stageId + "' in build #" + buildNumber + "'");
+            throw new IllegalArgumentException("No such stage '" + stageId + "' in build #" + buildNumber);
         }
 
         List<Map<String, Object>> steps = new ArrayList<>();
@@ -191,17 +191,17 @@ public class PipelineTools implements McpServerExtension {
         WorkflowRun run = resolveRun(jobFullName, buildNumber);
         FlowExecution execution = run.getExecution();
         if (execution == null) {
-            throw new IllegalArgumentException("No such step '" + stepId + "' in build #" + buildNumber + "'");
+            throw new IllegalArgumentException("No such step '" + stepId + "' in build #" + buildNumber);
         }
 
         FlowNode node;
         try {
             node = execution.getNode(stepId);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to look up step '" + stepId + "' in build #" + buildNumber + "'", e);
+            throw new RuntimeException("Failed to look up step '" + stepId + "' in build #" + buildNumber, e);
         }
         if (node == null) {
-            throw new IllegalArgumentException("No such step '" + stepId + "' in build #" + buildNumber + "'");
+            throw new IllegalArgumentException("No such step '" + stepId + "' in build #" + buildNumber);
         }
 
         LogAction log = node.getPersistentAction(LogAction.class);
@@ -222,8 +222,7 @@ public class PipelineTools implements McpServerExtension {
         } catch (CapReachedException capped) {
             // reading stops the moment the cap is hit; buffer holds the capped prefix
         } catch (IOException e) {
-            throw new RuntimeException(
-                    "Failed to read log for step '" + stepId + "' in build #" + buildNumber + "'", e);
+            throw new RuntimeException("Failed to read log for step '" + stepId + "' in build #" + buildNumber, e);
         }
 
         byte[] bytes = buffer.toByteArray();

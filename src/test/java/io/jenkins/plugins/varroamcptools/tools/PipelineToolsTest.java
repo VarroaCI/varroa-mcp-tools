@@ -428,7 +428,27 @@ class PipelineToolsTest {
         assertThat(response.has("error")).isFalse();
         String msg = getToolError(response);
         assertThat(msg).isNotNull();
-        assertThat(msg).isEqualTo("No such stage 'nonexistent-stage-id' in build #" + run.getNumber() + "'");
+        assertThat(msg).isEqualTo("No such stage 'nonexistent-stage-id' in build #" + run.getNumber());
+    }
+
+    @Test
+    void getStepLogUnknownStepId(JenkinsRule j) throws Exception {
+        buildFixture(j);
+        McpSessionClient client = new McpSessionClient(j.getURL());
+        client.initialize();
+
+        JSONObject response = client.callTool(
+                "getStepLog",
+                Map.of(
+                        "jobFullName", job.getFullName(),
+                        "buildNumber", run.getNumber(),
+                        "stepId", "nonexistent-step-id"));
+        client.close();
+
+        assertThat(response.has("error")).isFalse();
+        String msg = getToolError(response);
+        assertThat(msg).isNotNull();
+        assertThat(msg).isEqualTo("No such step 'nonexistent-step-id' in build #" + run.getNumber());
     }
 
     @Test
