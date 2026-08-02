@@ -1,8 +1,5 @@
 # AGENTS.md
 
-If an untracked `INIT.md` exists in the repo root, read it before anything else —
-it is local bootstrap context and must never be committed.
-
 ## What This Project Is
 
 `varroa-mcp-tools` is a Jenkins plugin (MIT) that extends the official
