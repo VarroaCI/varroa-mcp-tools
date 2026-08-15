@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   release-please:
-    runs-on: varroa-mcp-tools-runner
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: write
@@ -38,16 +38,21 @@ jobs:
   build:
     needs: release-please
     if: needs.release-please.outputs.release_created == 'true'
-    runs-on: varroa-mcp-tools-runner
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     container:
       image: maven:3.9-eclipse-temurin-21
-      volumes:
-        - varroa-m2-cache:/root/.m2
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ needs.release-please.outputs.tag_name }}
+      # Ephemeral runners drop the named docker volume this job used to mount.
+      - uses: actions/cache@v4
+        with:
+          path: /root/.m2/repository
+          key: m2-release-${{ hashFiles('pom.xml') }}
+          restore-keys: |
+            m2-release-
       - name: Stamp version and package
         # Container run steps default to `sh`, which rejects `set -o pipefail`;
         # the maven image ships bash, so run this step under it.
@@ -68,7 +73,7 @@ jobs:
   publish:
     needs: [release-please, build]
     if: needs.release-please.outputs.release_created == 'true'
-    runs-on: varroa-mcp-tools-runner
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: write
@@ -77,8 +82,9 @@ jobs:
         with:
           name: hpi
       # Upload via the GitHub API (github-script's pre-authenticated octokit)
-      # rather than the gh CLI: gh is not installed on the ARC scale-set
-      # runners. Clobbers any existing same-named asset for idempotent re-runs.
+      # rather than the gh CLI, so this step does not depend on what the runner
+      # image ships. Clobbers any existing same-named asset for idempotent
+      # re-runs.
       - name: Attach hpi to the release
         uses: actions/github-script@v7
         with:

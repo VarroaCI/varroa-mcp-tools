@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 jobs:
   resolve-canary-versions:
-    runs-on: varroa-mcp-tools-runner
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       weekly_version: ${{ steps.resolve.outputs.weekly_version }}
@@ -27,7 +27,7 @@ jobs:
           echo "mcp_incremental_version=$INCR" >> "$GITHUB_OUTPUT"
   build:
     needs: resolve-canary-versions
-    runs-on: varroa-mcp-tools-runner
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -39,10 +39,15 @@ jobs:
             build_arg: -Dmcp-server-plugin.version=${{ needs.resolve-canary-versions.outputs.mcp_incremental_version }}
     container:
       image: maven:3.9-eclipse-temurin-21
-      volumes:
-        - varroa-m2-cache:/root/.m2
     steps:
       - uses: actions/checkout@v7
+      # Ephemeral runners drop the named docker volume this job used to mount.
+      - uses: actions/cache@v4
+        with:
+          path: /root/.m2/repository
+          key: m2-canary-${{ matrix.leg }}-${{ hashFiles('pom.xml') }}
+          restore-keys: |
+            m2-canary-${{ matrix.leg }}-
       - run: mvn -B verify ${{ matrix.build_arg }}
       - if: failure()
         uses: actions/upload-artifact@v7
@@ -52,7 +57,7 @@ jobs:
   file-on-failure:
     needs: build
     if: failure()
-    runs-on: varroa-mcp-tools-runner
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       # No checkout: gh issue create/comment only needs GH_TOKEN + the repo

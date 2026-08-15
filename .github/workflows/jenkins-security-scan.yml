@@ -16,12 +16,11 @@ jobs:
     # this repo is private and activates automatically when it goes public
     # (planned for jenkinsci hosting; see SR-2 transitional-CI note).
     if: ${{ !github.event.repository.private }}
-    # SR-1 (coordinator-approved 2026-07-17, cross-change-review-plugin-bootstrap.md
-    # Seam Log): this delegated reusable workflow's internal `scan` job hardcodes
+    # This delegated reusable workflow's internal `scan` job hardcodes
     # `runs-on: ubuntu-latest` with no runner-override input in its `workflow_call`
-    # inputs (verified against jenkins-infra/jenkins-security-scan@v2 source). It is
-    # the one named, scope-limited exception to the self-hosted mandate in this
-    # change. Do not vendor/fork to force self-hosted.
+    # inputs (verified against jenkins-infra/jenkins-security-scan@v2 source).
+    # Every other workflow here now targets ubuntu-latest too, so this is no
+    # longer an exception. Do not vendor/fork it to change the runner.
     uses: jenkins-infra/jenkins-security-scan/.github/workflows/jenkins-security-scan.yaml@v2
     with:
       java-cache: maven
