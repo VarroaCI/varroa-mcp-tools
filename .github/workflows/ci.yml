@@ -1,11 +1,15 @@
 # NOTE: This CI setup is transitional per coordinator SR-2
 # (cross-change-review-plugin-bootstrap.md Seam Log). It targets a working
-# product now on the varroa-mcp-tools-runner (self-hosted). If/when the plugin
-# moves under the jenkinsci org, this CI is expected to be rewritten to jenkinsci
-# ecosystem conventions: a buildPlugin() Jenkinsfile (ci.jenkins.io),
-# GitHub-hosted matrix legs, and a JEP-229 cd.yml for CD. Do not mistake the
-# self-hosted container-job design for a permanent architectural commitment;
-# optimize for shipping, not for hosting-era CI.
+# product now on GitHub-hosted runners. If/when the plugin moves under the
+# jenkinsci org, this CI is expected to be rewritten to jenkinsci ecosystem
+# conventions: a buildPlugin() Jenkinsfile (ci.jenkins.io) and a JEP-229 cd.yml
+# for CD. Do not mistake the container-job matrix for a permanent architectural
+# commitment; optimize for shipping, not for hosting-era CI.
+#
+# Runners: ubuntu-latest, not a self-hosted scale set. The plugin must build on
+# runners the jenkinsci org can actually provide, and pinning to a private
+# cluster's ARC scale set made every workflow here unrunnable the moment that
+# scale set went away.
 
 name: CI
 on:
@@ -22,7 +26,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   resolve-versions:
-    runs-on: varroa-mcp-tools-runner
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       lts_version: ${{ steps.resolve.outputs.lts_version }}
@@ -44,7 +48,7 @@ jobs:
           echo "weekly_version=$WEEKLY" >> "$GITHUB_OUTPUT"
   build:
     needs: resolve-versions
-    runs-on: varroa-mcp-tools-runner
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -61,10 +65,16 @@ jobs:
             jenkins_version_arg: -Djenkins.version=${{ needs.resolve-versions.outputs.weekly_version }}
     container:
       image: maven:3.9-eclipse-temurin-${{ matrix.jdk }}
-      volumes:
-        - varroa-m2-cache:/root/.m2
     steps:
       - uses: actions/checkout@v7
+      # GitHub-hosted runners are ephemeral, so the named docker volume this job
+      # used to mount is gone. actions/cache restores the same ~/.m2 instead.
+      - uses: actions/cache@v4
+        with:
+          path: /root/.m2/repository
+          key: m2-${{ matrix.leg }}-${{ hashFiles('pom.xml') }}
+          restore-keys: |
+            m2-${{ matrix.leg }}-
       - run: mvn -B verify ${{ matrix.jenkins_version_arg }}
       - if: failure()
         uses: actions/upload-artifact@v7
