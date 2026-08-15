@@ -22,6 +22,7 @@ security realm and authorization strategy decide everything.
 | `getStepLog` | Returns a byte-capped log excerpt for a single Pipeline step. | `Item.READ` |
 | `getNodes` | Returns a bounded list of Jenkins nodes with basic status and cheap cached monitor data (disk and temp space). | `Jenkins.READ` |
 | `getExecutorStatus` | Returns per-node executor occupancy and current-build reference. | `Jenkins.READ` |
+| `abortBuild` | Aborts a running build, the tool-call equivalent of the stop button on its build page. | `Item.CANCEL` |
 
 ## Installing
 
