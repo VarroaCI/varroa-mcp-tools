@@ -16,10 +16,12 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths-ignore:
+      - 'openspec/**'
       - '.gitignore'
   push:
     branches: [main]
     paths-ignore:
+      - 'openspec/**'
       - '.gitignore'
 concurrency:
   group: ci-${{ github.ref }}
