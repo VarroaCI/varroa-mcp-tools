@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/VarroaCI/varroa-mcp-tools/compare/v1.0.3...v1.1.0) (2026-08-15)
+
+
+### Features
+
+* add abortBuild tool ([#18](https://github.com/VarroaCI/varroa-mcp-tools/issues/18)) ([e121d0e](https://github.com/VarroaCI/varroa-mcp-tools/commit/e121d0eb50fa0887a31b7d3a0971761ddd3fed77))
+
 ## [1.0.3](https://github.com/varroaci/varroa-mcp-tools/compare/v1.0.2...v1.0.3) (2026-07-19)
 
 
