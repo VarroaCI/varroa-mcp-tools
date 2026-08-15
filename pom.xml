@@ -60,6 +60,14 @@
       <version>3.27.7</version>
       <scope>test</scope>
     </dependency>
+    <!-- Provides the input step, used by BuildToolsTest to verify that a
+         Pipeline paused for input retains its one-off executor and is aborted
+         through the normal path. -->
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>pipeline-input-step</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-basic-steps</artifactId>

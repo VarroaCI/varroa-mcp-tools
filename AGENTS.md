@@ -5,8 +5,8 @@
 `varroa-mcp-tools` is a Jenkins plugin (MIT) that extends the official
 [mcp-server-plugin](https://github.com/jenkinsci/mcp-server-plugin) with
 operational tools for MCP agents: pipeline stage/step introspection, test
-results, node/executor status, and later queue operations, plugin inventory,
-and audit logging of agent actions. Tools are served by the official plugin's
+results, node/executor status, build abort, and later queue operations, plugin
+inventory, and audit logging of agent actions. Tools are served by the official plugin's
 endpoint (`/mcp-server/mcp`) and run with the permissions of the authenticated
 Jenkins user.
 
