@@ -87,7 +87,7 @@ jobs:
       # image ships. Clobbers any existing same-named asset for idempotent
       # re-runs.
       - name: Attach hpi to the release
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
