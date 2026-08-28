@@ -48,7 +48,7 @@ jobs:
         with:
           ref: ${{ needs.release-please.outputs.tag_name }}
       # Ephemeral runners drop the named docker volume this job used to mount.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: /root/.m2/repository
           key: m2-release-${{ hashFiles('pom.xml') }}

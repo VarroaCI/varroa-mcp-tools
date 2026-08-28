@@ -71,7 +71,7 @@ jobs:
       - uses: actions/checkout@v7
       # GitHub-hosted runners are ephemeral, so the named docker volume this job
       # used to mount is gone. actions/cache restores the same ~/.m2 instead.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: /root/.m2/repository
           key: m2-${{ matrix.leg }}-${{ hashFiles('pom.xml') }}
