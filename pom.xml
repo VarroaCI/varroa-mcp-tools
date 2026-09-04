@@ -22,7 +22,7 @@
     <jenkins.version>2.533</jenkins.version>
     <spotless.check.skip>false</spotless.check.skip>
     <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
-    <mcp-server-plugin.version>0.178.vffe5a_e770f3b_</mcp-server-plugin.version>
+    <mcp-server-plugin.version>0.202.vdb_1a_a_9cfe7b_1</mcp-server-plugin.version>
   </properties>
 
   <dependencyManagement>
